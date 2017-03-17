@@ -1,0 +1,36 @@
+{
+  "name": "js-index-builder",
+  "version": "0.0.1",
+  "description": "Cache buster for mustache",
+  "main": "index.js",
+  "scripts": {
+    "eslint": "./node_modules/.bin/eslint index.js",
+    "build": "npm run eslint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ViBiOh/js-index-builder.git"
+  },
+  "keywords": [
+    "mutache",
+    "cache-buster"
+  ],
+  "author": "Vincent Boutour",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ViBiOh/js-index-builder/issues"
+  },
+  "homepage": "https://github.com/ViBiOh/js-index-builder",
+  "devDependencies": {
+    "eslint": "latest",
+    "eslint-config-airbnb": "latest",
+    "eslint-plugin-import": "latest"
+  },
+  "dependencies": {
+    "glob": "latest",
+    "js-utils": "git+https://github.com/ViBiOh/js-utils.git",
+    "mkdirp": "latest",
+    "mustache": "latest",
+    "yargs": "latest"
+  }
+}
