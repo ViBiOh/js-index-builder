@@ -64,29 +64,16 @@ const options = require('yargs')
 const outputIndexSchema = Math.max(0, options.template.indexOf('*'));
 const requiredPromises = [];
 
-/**
- * Handle any error thrown by application and call reject callback.
- * @param  {Error}    error  Error thrown
- * @param  {Function} reject Reject callback function
- */
 function handleError(error, reject) {
   if (error) {
     reject(error);
   }
 }
 
-/**
- * Display execution success.
- * @param  {String} output Success description
- */
 function displaySuccess(output) {
   console.log(output);
 }
 
-/**
- * Display execution error and stop process.
- * @param  {String|Error} error Error ou String to display before quiting
- */
 function displayError(error) {
   if (error instanceof Error) {
     console.error(error.stack);

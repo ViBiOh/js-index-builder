@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
-const path = require('path');
 const glob = require('glob');
 const utils = require('js-utils');
+
+const UTF_8 = 'utf-8';
 
 const promiseReadFile = utils.asyncifyCallback(fs.readFile);
 const promiseWriteFile = utils.asyncifyCallback(fs.writeFile);
@@ -47,10 +48,8 @@ function displayError(error) {
 
 function jsonPromise(json) {
   return new Promise((resolve, reject) => {
-    promiseReadFile(json, 'utf-8')
-      .then((content) => {
-        resolve(JSON.parse(content));
-      }).catch(reject);
+    promiseReadFile(json, UTF_8)
+      .then(content => resolve(JSON.parse(content))).catch(reject);
   });
 }
 
@@ -77,10 +76,10 @@ new Promise((resolve, reject) => {
     handleError(error, reject);
 
     Promise.all(jsons.map(jsonPromise))
-      .then(pages => {
-          promiseWriteFile(options.sitemap, sitemapStructure(pages.map(sitemapConverter).join('')))
-            .then(() => resolve(jsons.join('\n')))
-            .catch(reject);
+      .then((pages) => {
+        promiseWriteFile(options.sitemap, sitemapStructure(pages.map(sitemapConverter).join('')))
+          .then(() => resolve(jsons.join('\n')))
+          .catch(reject);
       }).catch(reject);
   });
 }).then(displaySuccess).catch(displayError);
