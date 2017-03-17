@@ -4,7 +4,7 @@
   "description": "Cache buster for mustache",
   "main": "index.js",
   "scripts": {
-    "eslint": "./node_modules/.bin/eslint index.js",
+    "eslint": "./node_modules/.bin/eslint *.js",
     "build": "npm run eslint"
   },
   "repository": {
@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "glob": "latest",
+    "jpegtran-bin": "latest",
     "js-utils": "git+https://github.com/ViBiOh/js-utils.git",
     "mkdirp": "latest",
     "mustache": "latest",
