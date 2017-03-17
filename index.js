@@ -7,6 +7,8 @@ const mkdirp = require('mkdirp');
 const Mustache = require('mustache');
 const utils = require('js-utils');
 
+const UTF_8 = 'utf-8';
+
 const promiseReadFile = utils.asyncifyCallback(fs.readFile);
 const promiseWriteFile = utils.asyncifyCallback(fs.writeFile);
 const promiseMkdirP = utils.asyncifyCallback(mkdirp);
@@ -53,19 +55,32 @@ const options = require('yargs')
   .strict()
   .argv;
 
-const OUTPUT_INDEX_SCHEMA = Math.max(0, options.template.indexOf('*'));
+const outputIndexSchema = Math.max(0, options.template.indexOf('*'));
 const requiredPromises = [];
 
+/**
+ * Handle any error thrown by application and call reject callback.
+ * @param  {Error}    error  Error thrown
+ * @param  {Function} reject Reject callback function
+ */
 function handleError(error, reject) {
   if (error) {
     reject(error);
   }
 }
 
+/**
+ * Display execution success.
+ * @param  {String} output Success description
+ */
 function displaySuccess(output) {
   console.log(output);
 }
 
+/**
+ * Display execution error and stop process.
+ * @param  {String|Error} error Error ou String to display before quiting
+ */
 function displayError(error) {
   if (error instanceof Error) {
     console.error(error.stack);
@@ -81,7 +96,7 @@ function inline(pattern) {
       glob(pattern, {}, (error, files) => {
         handleError(error, reject);
 
-        Promise.all(files.map(file => promiseReadFile(file, 'utf-8')))
+        Promise.all(files.map(file => promiseReadFile(file, UTF_8)))
           .then(contents => resolve(contents.join('')))
           .catch(reject);
       });
@@ -90,19 +105,19 @@ function inline(pattern) {
   return Promise.resolve('');
 }
 
-function partialPromise(partialFile, partialObj) {
+function partialPromise(partialFile) {
   return new Promise((resolve, reject) => {
-    promiseReadFile(partialFile, 'utf-8').then((partialContent) => {
-      // eslint-disable-next-line no-param-reassign
-      partialObj[path.basename(partialFile)] = partialContent;
-      resolve();
+    promiseReadFile(partialFile, UTF_8).then((partialContent) => {
+      resolve({
+        [path.basename(partialFile)]: partialContent,
+      });
     }).catch(reject);
   });
 }
 
 function mustachePromise(mustacheFile, template) {
   return new Promise((resolve) => {
-    promiseReadFile(mustacheFile, 'utf-8')
+    promiseReadFile(mustacheFile, UTF_8)
       .then(resolve)
       .catch((error) => {
         resolve('{}');
@@ -114,7 +129,7 @@ function mustachePromise(mustacheFile, template) {
 function templatePromise(template, partials) {
   return new Promise((resolve, reject) => {
     Promise.all([
-      promiseReadFile(template, 'utf-8'),
+      promiseReadFile(template, UTF_8),
       mustachePromise(path.join(path.dirname(template), 'mustache.json'), template),
     ]).then((values) => {
       const data = JSON.parse(values[1]);
@@ -124,7 +139,7 @@ function templatePromise(template, partials) {
 
       const rendered = Mustache.render(values[0], data, partials);
       if (options.output) {
-        const outputFile = path.join(options.output, template.substring(OUTPUT_INDEX_SCHEMA));
+        const outputFile = path.join(options.output, template.substring(outputIndexSchema));
         promiseMkdirP(path.dirname(outputFile))
           .then(() => promiseWriteFile(outputFile, rendered).then(() => resolve(outputFile)))
           .catch(reject);
@@ -140,9 +155,10 @@ if (options.partials) {
     glob(options.partials, {}, (error, partials) => {
       handleError(error, reject);
 
-      const partialObj = {};
-      Promise.all(partials.map(partial => partialPromise(partial, partialObj)))
-        .then(() => resolve(partialObj))
+      Promise.all(partials.map(partial => partialPromise(partial)))
+        .then(partialFiles =>
+          resolve(partialFiles.reduce((previous, current) => ({ ...previous, ...current }), {})),
+        )
         .catch(reject);
     });
   }));
