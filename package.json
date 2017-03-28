@@ -27,7 +27,7 @@
     "eslint-plugin-import": "latest"
   },
   "dependencies": {
-    "clean-css": "latest",
+    "clean-css-cli": "latest",
     "glob": "latest",
     "jpegtran-bin": "latest",
     "js-utils": "git+https://github.com/ViBiOh/js-utils.git",
