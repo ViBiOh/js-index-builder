@@ -16,7 +16,7 @@
     "cache-buster"
   ],
   "author": "Vincent Boutour",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/ViBiOh/js-index-builder/issues"
   },
