@@ -4,8 +4,8 @@
   "description": "Cache buster for mustache",
   "main": "index.js",
   "scripts": {
-    "prettier": "./node_modules/.bin/prettier --print-width 100 --single-quote --trailing-comma all --color --write \"./*.{js,jsx}\"",
-    "eslint": "./node_modules/.bin/eslint --fix ./*.js",
+    "prettier": "./node_modules/.bin/prettier --print-width 100 --single-quote --trailing-comma all --color --write \"./**/*.js\"",
+    "eslint": "./node_modules/.bin/eslint --fix \"./**/*.js\"",
     "codestyle": "npm run prettier && npm run eslint",
     "build": "npm run eslint"
   },
