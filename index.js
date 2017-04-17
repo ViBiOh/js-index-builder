@@ -145,19 +145,18 @@ function templatePromise(template, partials) {
 }
 
 if (options.partials) {
-  requiredPromises.push(
-    new Promise((resolve, reject) => {
-      glob(options.partials, {}, (error, partials) => {
-        handleError(error, reject);
+  const promise = new Promise((resolve, reject) => {
+    glob(options.partials, {}, (error, partials) => {
+      handleError(error, reject);
 
-        Promise.all(partials.map(partial => partialPromise(partial)))
-          .then((files) => {
-            resolve(files.reduce((previous, current) => Object.assign(previous, current), {}));
-          })
-          .catch(reject);
-      });
-    }),
-  );
+      Promise.all(partials.map(partial => partialPromise(partial)))
+        .then((files) => {
+          resolve(files.reduce((previous, current) => Object.assign(previous, current), {}));
+        })
+        .catch(reject);
+    });
+  });
+  requiredPromises.push(promise);
 } else {
   requiredPromises.push(Promise.resolve({}));
 }
