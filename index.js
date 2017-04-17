@@ -151,10 +151,8 @@ if (options.partials) {
         handleError(error, reject);
 
         Promise.all(partials.map(partial => partialPromise(partial)))
-          .then((partialFiles) => {
-            resolve(
-              partialFiles.reduce((previous, current) => Object.assign(previous, current), {}),
-            );
+          .then((files) => {
+            resolve(files.reduce((previous, current) => Object.assign(previous, current), {}));
           })
           .catch(reject);
       });
