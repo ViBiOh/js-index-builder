@@ -26,8 +26,7 @@ const options = require('yargs')
     describe: 'Output',
   })
   .help('help')
-  .strict()
-  .argv;
+  .strict().argv;
 
 const OUTPUT_INDEX_SCHEMA = Math.max(0, options.input.indexOf('*'));
 
@@ -72,8 +71,8 @@ new Promise((resolve, reject) => {
   glob(options.input, {}, (error, csss) => {
     handleError(error, reject);
 
-    Promise.all(csss.map(cleanCssPromise))
-      .then(values => resolve(values.join('\n')))
-      .catch(reject);
+    Promise.all(csss.map(cleanCssPromise)).then(values => resolve(values.join('\n'))).catch(reject);
   });
-}).then(displaySuccess).catch(displayError);
+})
+  .then(displaySuccess)
+  .catch(displayError);

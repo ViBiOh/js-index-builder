@@ -24,8 +24,7 @@ const options = require('yargs')
     describe: 'Output',
   })
   .help('help')
-  .strict()
-  .argv;
+  .strict().argv;
 
 const OUTPUT_INDEX_SCHEMA = Math.max(0, options.input.indexOf('*'));
 
@@ -53,14 +52,19 @@ function jpegPromise(image) {
     const outputFile = path.join(options.output, image.substring(OUTPUT_INDEX_SCHEMA));
     promiseMkdirP(path.dirname(outputFile))
       .then(() => {
-        execFile(jpegtran, ['-optimize', '-progressive', '-copy', 'none', '-outfile', outputFile, image], (err) => {
-          if (err) {
-            handleError(err, reject);
-            return;
-          }
-          resolve(image);
-        });
-      }).catch(reject);
+        execFile(
+          jpegtran,
+          ['-optimize', '-progressive', '-copy', 'none', '-outfile', outputFile, image],
+          (err) => {
+            if (err) {
+              handleError(err, reject);
+              return;
+            }
+            resolve(image);
+          },
+        );
+      })
+      .catch(reject);
   });
 }
 
@@ -72,4 +76,6 @@ new Promise((resolve, reject) => {
       .then(values => resolve(values.join('\n')))
       .catch(reject);
   });
-}).then(displaySuccess).catch(displayError);
+})
+  .then(displaySuccess)
+  .catch(displayError);

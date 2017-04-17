@@ -24,8 +24,7 @@ const options = require('yargs')
     describe: 'Sitemap path',
   })
   .help('help')
-  .strict()
-  .argv;
+  .strict().argv;
 
 function handleError(error, reject) {
   if (error) {
@@ -48,8 +47,7 @@ function displayError(error) {
 
 function jsonPromise(json) {
   return new Promise((resolve, reject) => {
-    promiseReadFile(json, UTF_8)
-      .then(content => resolve(JSON.parse(content))).catch(reject);
+    promiseReadFile(json, UTF_8).then(content => resolve(JSON.parse(content))).catch(reject);
   });
 }
 
@@ -80,6 +78,9 @@ new Promise((resolve, reject) => {
         promiseWriteFile(options.sitemap, sitemapStructure(pages.map(sitemapConverter).join('')))
           .then(() => resolve(jsons.join('\n')))
           .catch(reject);
-      }).catch(reject);
+      })
+      .catch(reject);
   });
-}).then(displaySuccess).catch(displayError);
+})
+  .then(displaySuccess)
+  .catch(displayError);
