@@ -33,7 +33,7 @@
     "clean-css": "latest",
     "glob": "latest",
     "jpegtran-bin": "latest",
-    "js-utils": "https://github.com/ViBiOh/js-utils.git",
+    "js-utils": "git+https://github.com/ViBiOh/js-utils.git",
     "mkdirp": "latest",
     "mustache": "latest",
     "yargs": "latest"
