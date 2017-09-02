@@ -4,19 +4,17 @@
   "description": "Cache buster for mustache",
   "main": "index.js",
   "scripts": {
-    "prettier": "./node_modules/.bin/prettier --print-width 100 --single-quote --trailing-comma all --color --write \"./*.js\"",
-    "eslint": "./node_modules/.bin/eslint --fix \"./*.js\"",
-    "codestyle": "npm run prettier && npm run eslint",
-    "build": "npm run codestyle"
+    "postinstall": "chmod +x *.js",
+    "format":
+      "./node_modules/.bin/prettier --print-width 100 --single-quote --trailing-comma all --color --write \"./*.js\"",
+    "lint": "./node_modules/.bin/eslint --fix \"./*.js\"",
+    "build": "npm run format && npm run lint"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/ViBiOh/js-index-builder.git"
   },
-  "keywords": [
-    "mutache",
-    "cache-buster"
-  ],
+  "keywords": ["mutache", "cache-buster"],
   "author": "Vincent Boutour",
   "license": "MIT",
   "bugs": {
