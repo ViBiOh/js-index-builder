@@ -33,21 +33,23 @@ function handleError(error, reject) {
 }
 
 function displaySuccess(output) {
-  console.log(output);
+  global.console.log(output);
 }
 
 function displayError(error) {
   if (error instanceof Error) {
-    console.error(error.stack);
+    global.console.error(error.stack);
   } else {
-    console.error(error);
+    global.console.error(error);
   }
   process.exit(1);
 }
 
 function jsonPromise(json) {
   return new Promise((resolve, reject) => {
-    promiseReadFile(json, UTF_8).then(content => resolve(JSON.parse(content))).catch(reject);
+    promiseReadFile(json, UTF_8)
+      .then(content => resolve(JSON.parse(content)))
+      .catch(reject);
   });
 }
 

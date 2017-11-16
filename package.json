@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "chmod +x *.js",
-    "format":
-      "./node_modules/.bin/prettier --print-width 100 --single-quote --trailing-comma all --color --write \"./*.js\"",
+    "format": "./node_modules/.bin/prettier --write \"./*.js\"",
     "lint": "./node_modules/.bin/eslint --fix \"./*.js\"",
     "build": "npm run format && npm run lint"
   },
@@ -35,5 +34,10 @@
     "mkdirp": "latest",
     "mustache": "latest",
     "yargs": "latest"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "trailingComma": "all"
   }
 }

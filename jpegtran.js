@@ -5,7 +5,7 @@ const path = require('path');
 const mkdirp = require('mkdirp');
 const jpegtran = require('jpegtran-bin');
 const utils = require('js-utils');
-const execFile = require('child_process').execFile;
+const { execFile } = require('child_process');
 
 const promiseMkdirP = utils.asyncifyCallback(mkdirp);
 
@@ -35,14 +35,14 @@ function handleError(error, reject) {
 }
 
 function displaySuccess(output) {
-  console.log(output);
+  global.console.log(output);
 }
 
 function displayError(error) {
   if (error instanceof Error) {
-    console.error(error.stack);
+    global.console.error(error.stack);
   } else {
-    console.error(error);
+    global.console.error(error);
   }
   process.exit(1);
 }

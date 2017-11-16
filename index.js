@@ -70,14 +70,14 @@ function handleError(error, reject) {
 }
 
 function displaySuccess(output) {
-  console.log(output);
+  global.console.log(output);
 }
 
 function displayError(error) {
   if (error instanceof Error) {
-    console.error(error.stack);
+    global.console.error(error.stack);
   } else {
-    console.error(error);
+    global.console.error(error);
   }
   process.exit(1);
 }
@@ -111,10 +111,12 @@ function partialPromise(partialFile) {
 
 function mustachePromise(mustacheFile, template) {
   return new Promise((resolve) => {
-    promiseReadFile(mustacheFile, UTF_8).then(resolve).catch((error) => {
-      resolve('{}');
-      console.warn(`Unable to read ${mustacheFile} for template ${template} with reason ${error}`);
-    });
+    promiseReadFile(mustacheFile, UTF_8)
+      .then(resolve)
+      .catch((error) => {
+        resolve('{}');
+        global.console.warn(`Unable to read ${mustacheFile} for template ${template} with reason ${error}`);
+      });
   });
 }
 
