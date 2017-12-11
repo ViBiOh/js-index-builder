@@ -54,7 +54,7 @@ function jsonPromise(json) {
 }
 
 function sitemapConverter(data) {
-  return `. <url>
+  return `<url>
     <loc>${data.url}</loc>
     <changefreq>weekly</changefreq>
     <priority>1.00</priority>
