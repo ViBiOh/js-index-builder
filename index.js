@@ -115,7 +115,9 @@ function mustachePromise(mustacheFile, template) {
       .then(resolve)
       .catch((error) => {
         resolve('{}');
-        global.console.warn(`Unable to read ${mustacheFile} for template ${template} with reason ${error}`);
+        global.console.warn(
+          `Unable to read ${mustacheFile} for template ${template} with reason ${error}`,
+        );
       });
   });
 }

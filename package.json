@@ -13,7 +13,10 @@
     "type": "git",
     "url": "git://github.com/ViBiOh/js-index-builder.git"
   },
-  "keywords": ["mutache", "cache-buster"],
+  "keywords": [
+    "mutache",
+    "cache-buster"
+  ],
   "author": "Vincent Boutour",
   "license": "MIT",
   "bugs": {
@@ -21,8 +24,8 @@
   },
   "homepage": "https://github.com/ViBiOh/js-index-builder",
   "devDependencies": {
-    "eslint": "latest",
-    "eslint-config-airbnb": "latest",
+    "eslint": "4",
+    "eslint-config-airbnb-base": "latest",
     "eslint-plugin-import": "latest",
     "prettier": "latest"
   },
