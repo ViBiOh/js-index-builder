@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "chmod +x *.js",
-    "format": "./node_modules/.bin/prettier --write \"./*.js\"",
-    "lint": "./node_modules/.bin/eslint --fix \"./*.js\"",
+    "format": "prettier --write \"./*.js\"",
+    "lint": "eslint --fix \"./*.js\"",
     "build": "npm run format && npm run lint"
   },
   "repository": {
