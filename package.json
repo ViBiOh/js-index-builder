@@ -32,7 +32,6 @@
   "dependencies": {
     "clean-css": "latest",
     "glob": "latest",
-    "jpegtran-bin": "latest",
     "js-utils": "ViBiOh/js-utils",
     "mkdirp": "latest",
     "mustache": "latest",
