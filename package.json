@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/ViBiOh/js-index-builder",
   "devDependencies": {
-    "eslint": "4",
+    "eslint": "5",
     "eslint-config-airbnb-base": "latest",
     "eslint-plugin-import": "latest",
     "prettier": "latest"
