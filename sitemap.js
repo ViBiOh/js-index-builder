@@ -75,7 +75,7 @@ new Promise((resolve, reject) => {
     handleError(error, reject);
 
     Promise.all(jsons.map(jsonPromise))
-      .then((pages) => {
+      .then(pages => {
         promiseWriteFile(options.sitemap, sitemapStructure(pages.map(sitemapConverter).join('')))
           .then(() => resolve(jsons.join('\n')))
           .catch(reject);

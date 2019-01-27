@@ -100,7 +100,7 @@ function inline(pattern) {
 function partialPromise(partialFile) {
   return new Promise((resolve, reject) => {
     promiseReadFile(partialFile, UTF_8)
-      .then((partialContent) => {
+      .then(partialContent => {
         resolve({
           [path.basename(partialFile)]: partialContent,
         });
@@ -110,10 +110,10 @@ function partialPromise(partialFile) {
 }
 
 function mustachePromise(mustacheFile, template) {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     promiseReadFile(mustacheFile, UTF_8)
       .then(resolve)
-      .catch((error) => {
+      .catch(error => {
         resolve('{}');
         global.console.warn(
           `Unable to read ${mustacheFile} for template ${template} with reason ${error}`,
@@ -128,7 +128,7 @@ function templatePromise(template, partials) {
       promiseReadFile(template, UTF_8),
       mustachePromise(path.join(path.dirname(template), 'mustache.json'), template),
     ])
-      .then((values) => {
+      .then(values => {
         const data = JSON.parse(values[1]);
         if (options.bust) {
           data.version = options.bust;
@@ -154,7 +154,7 @@ if (options.partials) {
       handleError(error, reject);
 
       Promise.all(partials.map(partial => partialPromise(partial)))
-        .then((files) => {
+        .then(files => {
           resolve(files.reduce((previous, current) => Object.assign(previous, current), {}));
         })
         .catch(reject);
@@ -171,7 +171,7 @@ requiredPromises.push(inline(options.svg));
 
 new Promise((resolve, reject) => {
   Promise.all(requiredPromises)
-    .then((required) => {
+    .then(required => {
       const partials = required[0];
       partials.inlineJs = `<script type="text/javascript">${required[1]}</script>`;
       partials.inlineCss = `<style type="text/css">${required[2]}</style>`;
