@@ -25,7 +25,7 @@
   "homepage": "https://github.com/ViBiOh/js-index-builder",
   "devDependencies": {
     "clean-css": "4.2.1",
-    "eslint": "5.15.0",
+    "eslint": "5.15.1",
     "eslint-config-airbnb": "17.1.0",
     "eslint-config-prettier": "4.1.0",
     "eslint-plugin-import": "2.16.0",
@@ -36,7 +36,7 @@
     "js-utils": "github:ViBiOh/js-utils",
     "mkdirp": "0.5.1",
     "mustache": "3.0.1",
-    "yargs": "13.2.1"
+    "yargs": "13.2.2"
   },
   "prettier": {
     "printWidth": 100,
