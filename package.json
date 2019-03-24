@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "glob": "7.1.3",
-    "js-utils": "github:ViBiOh/js-utils",
+    "js-utils": "github:ViBiOh/js-utils#master",
     "mkdirp": "0.5.1",
     "mustache": "3.0.1",
     "yargs": "13.2.2"
