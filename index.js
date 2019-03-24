@@ -173,8 +173,8 @@ new Promise((resolve, reject) => {
   Promise.all(requiredPromises)
     .then(required => {
       const partials = required[0];
-      partials.inlineJs = `<script type="text/javascript">${required[1]}</script>`;
-      partials.inlineCss = `<style type="text/css">${required[2]}</style>`;
+      partials.inlineJs = `<script>${required[1]}</script>`;
+      partials.inlineCss = `<style>${required[2]}</style>`;
       partials.inlineSvg = String(required[3]);
 
       glob(options.template, {}, (error, templates) => {
