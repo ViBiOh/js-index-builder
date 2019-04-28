@@ -27,7 +27,7 @@
     "clean-css": "4.2.1",
     "eslint": "5.16.0",
     "eslint-config-airbnb": "17.1.0",
-    "eslint-config-prettier": "4.1.0",
+    "eslint-config-prettier": "4.2.0",
     "eslint-plugin-import": "2.17.2",
     "prettier": "1.17.0"
   },
