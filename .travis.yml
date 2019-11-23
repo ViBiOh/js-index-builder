@@ -1,8 +1,10 @@
+---
+
 language: node_js
 node_js: 13
 script: npm run build
 cache:
   directories:
-  - "${HOME}/.npm"
+    - "${HOME}/.npm"
 notifications:
   email: false
