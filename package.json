@@ -6,8 +6,8 @@
   "scripts": {
     "postinstall": "chmod +x *.js",
     "format": "prettier --write \"./*.js\"",
-    "lint": "eslint --fix \"./*.js\"",
-    "build": "npm run format && npm run lint"
+    "style": "eslint --fix \"./*.js\"",
+    "build": "npm run format && npm run style"
   },
   "repository": {
     "type": "git",
