@@ -4,10 +4,8 @@ const fs = require('fs');
 const glob = require('glob');
 const utils = require('js-utils');
 
-const UTF_8 = 'utf-8';
-
-const promiseReadFile = utils.asyncifyCallback(fs.readFile);
-const promiseWriteFile = utils.asyncifyCallback(fs.writeFile);
+const readFile = utils.asyncifyCallback(fs.readFile);
+const writeFile = utils.asyncifyCallback(fs.writeFile);
 
 const options = require('yargs')
   .reset()
@@ -26,12 +24,6 @@ const options = require('yargs')
   .help('help')
   .strict().argv;
 
-function handleError(error, reject) {
-  if (error) {
-    reject(error);
-  }
-}
-
 function displaySuccess(output) {
   global.console.log(output);
 }
@@ -45,12 +37,20 @@ function displayError(error) {
   process.exit(1);
 }
 
-function jsonPromise(json) {
-  return new Promise((resolve, reject) => {
-    promiseReadFile(json, UTF_8)
-      .then(content => resolve(JSON.parse(content)))
-      .catch(reject);
+async function globPromise(pattern) {
+  return new Promise(resolve => {
+    glob(pattern, {}, (err, jsons) => {
+      if (err) {
+        throw err;
+      }
+      resolve(jsons);
+    });
   });
+}
+
+async function jsonPromise(json) {
+  const content = await readFile(json, 'utf-8');
+  return JSON.parse(content);
 }
 
 function sitemapConverter(data) {
@@ -70,18 +70,14 @@ ${urls}
 </urlset>`;
 }
 
-new Promise((resolve, reject) => {
-  glob(options.json, {}, (error, jsons) => {
-    handleError(error, reject);
+(async () => {
+  try {
+    const jsons = await globPromise(options.json);
+    const pages = await Promise.all(jsons.map(jsonPromise));
+    await writeFile(options.sitemap, sitemapStructure(pages.map(sitemapConverter).join('')));
 
-    Promise.all(jsons.map(jsonPromise))
-      .then(pages => {
-        promiseWriteFile(options.sitemap, sitemapStructure(pages.map(sitemapConverter).join('')))
-          .then(() => resolve(jsons.join('\n')))
-          .catch(reject);
-      })
-      .catch(reject);
-  });
-})
-  .then(displaySuccess)
-  .catch(displayError);
+    displaySuccess(jsons.join('\n'));
+  } catch (e) {
+    displayError(e);
+  }
+})();

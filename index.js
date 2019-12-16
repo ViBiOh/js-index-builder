@@ -9,9 +9,9 @@ const utils = require('js-utils');
 
 const UTF_8 = 'utf-8';
 
-const promiseReadFile = utils.asyncifyCallback(fs.readFile);
-const promiseWriteFile = utils.asyncifyCallback(fs.writeFile);
-const promiseMkdirP = utils.asyncifyCallback(mkdirp);
+const readFile = utils.asyncifyCallback(fs.readFile);
+const writeFile = utils.asyncifyCallback(fs.writeFile);
+const mkdirP = utils.asyncifyCallback(mkdirp);
 
 const options = require('yargs')
   .reset()
@@ -61,13 +61,6 @@ const options = require('yargs')
   .strict().argv;
 
 const outputIndexSchema = Math.max(0, options.template.indexOf('*'));
-const requiredPromises = [];
-
-function handleError(error, reject) {
-  if (error) {
-    reject(error);
-  }
-}
 
 function displaySuccess(output) {
   global.console.log(output);
@@ -82,110 +75,98 @@ function displayError(error) {
   process.exit(1);
 }
 
-function inline(pattern) {
-  if (pattern) {
-    return new Promise((resolve, reject) => {
-      glob(pattern, {}, (error, files) => {
-        handleError(error, reject);
-
-        Promise.all(files.map(file => promiseReadFile(file, UTF_8)))
-          .then(contents => resolve(contents.join('')))
-          .catch(reject);
-      });
-    });
-  }
-  return Promise.resolve('');
-}
-
-function partialPromise(partialFile) {
-  return new Promise((resolve, reject) => {
-    promiseReadFile(partialFile, UTF_8)
-      .then(partialContent => {
-        resolve({
-          [path.basename(partialFile)]: partialContent,
-        });
-      })
-      .catch(reject);
-  });
-}
-
-function mustachePromise(mustacheFile, template) {
+async function globPromise(pattern) {
   return new Promise(resolve => {
-    promiseReadFile(mustacheFile, UTF_8)
-      .then(resolve)
-      .catch(error => {
-        resolve('{}');
-        global.console.warn(
-          `Unable to read ${mustacheFile} for template ${template} with reason ${error}`,
-        );
-      });
-  });
-}
-
-function templatePromise(template, partials) {
-  return new Promise((resolve, reject) => {
-    Promise.all([
-      promiseReadFile(template, UTF_8),
-      mustachePromise(path.join(path.dirname(template), 'mustache.json'), template),
-    ])
-      .then(values => {
-        const data = JSON.parse(values[1]);
-        if (options.bust) {
-          data.version = options.bust;
-        }
-
-        const rendered = Mustache.render(values[0], data, partials);
-        if (options.output) {
-          const outputFile = path.join(options.output, template.substring(outputIndexSchema));
-          promiseMkdirP(path.dirname(outputFile))
-            .then(() => promiseWriteFile(outputFile, rendered).then(() => resolve(outputFile)))
-            .catch(reject);
-        } else {
-          resolve(rendered);
-        }
-      })
-      .catch(reject);
-  });
-}
-
-if (options.partials) {
-  const promise = new Promise((resolve, reject) => {
-    glob(options.partials, {}, (error, partials) => {
-      handleError(error, reject);
-
-      Promise.all(partials.map(partial => partialPromise(partial)))
-        .then(files => {
-          resolve(files.reduce((previous, current) => Object.assign(previous, current), {}));
-        })
-        .catch(reject);
+    glob(pattern, {}, (err, jsons) => {
+      if (err) {
+        throw err;
+      }
+      resolve(jsons);
     });
   });
-  requiredPromises.push(promise);
-} else {
-  requiredPromises.push(Promise.resolve({}));
 }
 
-requiredPromises.push(inline(options.js));
-requiredPromises.push(inline(options.css));
-requiredPromises.push(inline(options.svg));
+async function partialPromise(partialFile) {
+  const partialContent = await readFile(partialFile, UTF_8);
+  return {
+    [path.basename(partialFile)]: partialContent,
+  };
+}
 
-new Promise((resolve, reject) => {
-  Promise.all(requiredPromises)
-    .then(required => {
-      const partials = required[0];
-      partials.inlineJs = `<script>${required[1]}</script>`;
-      partials.inlineCss = `<style>${required[2]}</style>`;
-      partials.inlineSvg = String(required[3]);
+async function readPartial() {
+  const partials = await globPromise(options.partials);
 
-      glob(options.template, {}, (error, templates) => {
-        handleError(error, reject);
+  const files = await Promise.all(partials.map(partial => partialPromise(partial)));
+  return files.reduce((previous, current) => Object.assign(previous, current), {});
+}
 
-        Promise.all(templates.map(template => templatePromise(template, partials)))
-          .then(values => resolve(values.join('\n')))
-          .catch(reject);
-      });
-    })
-    .catch(reject);
-})
-  .then(displaySuccess)
-  .catch(displayError);
+async function inline(pattern) {
+  if (pattern) {
+    const files = await globPromise(pattern);
+    const content = await Promise.all(files.map(file => readFile(file, UTF_8)));
+    return content.join('');
+  }
+
+  return '';
+}
+
+async function mustachePromise(mustacheFile, template) {
+  try {
+    const content = await readFile(mustacheFile, UTF_8);
+    return JSON.parse(content);
+  } catch (e) {
+    global.console.warn(`Unable to read ${mustacheFile} for template ${template} with reason ${e}`);
+    return {};
+  }
+}
+
+async function templatePromise(template, partials) {
+  const values = await Promise.all([
+    readFile(template, UTF_8),
+    mustachePromise(path.join(path.dirname(template), 'mustache.json'), template),
+  ]);
+
+  const data = values[1];
+  if (options.bust) {
+    data.version = options.bust;
+  }
+
+  const rendered = Mustache.render(values[0], data, partials);
+  if (options.output) {
+    const outputFile = path.join(options.output, template.substring(outputIndexSchema));
+    await mkdirP(path.dirname(outputFile));
+    const output = await writeFile(outputFile, rendered);
+    return output;
+  }
+
+  return rendered;
+}
+
+(async () => {
+  const requiredPromises = [];
+
+  try {
+    if (options.partials) {
+      requiredPromises.push(readPartial());
+    }
+
+    requiredPromises.push(inline(options.js));
+    requiredPromises.push(inline(options.css));
+    requiredPromises.push(inline(options.svg));
+
+    const required = await Promise.all(requiredPromises);
+    const partials = required[0];
+    partials.inlineJs = `<script>${required[1]}</script>`;
+    partials.inlineCss = `<style>${required[2]}</style>`;
+    partials.inlineSvg = String(required[3]);
+
+    const templates = await globPromise(options.template);
+    const values = await Promise.all(
+      templates.map(template => templatePromise(template, partials)),
+    );
+
+    displaySuccess(values.join('\n'));
+  } catch (e) {
+    displayError(e);
+  }
+})();
