@@ -37,7 +37,7 @@
     "js-utils": "github:ViBiOh/js-utils#master",
     "mkdirp": "0.5.1",
     "mustache": "3.2.1",
-    "yargs": "15.0.2"
+    "yargs": "15.1.0"
   },
   "prettier": {
     "printWidth": 100,
