@@ -36,7 +36,7 @@
     "glob": "7.1.6",
     "js-utils": "github:ViBiOh/js-utils#master",
     "mkdirp": "0.5.1",
-    "mustache": "3.2.1",
+    "mustache": "4.0.0",
     "yargs": "15.1.0"
   },
   "prettier": {
