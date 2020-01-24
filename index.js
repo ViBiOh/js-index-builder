@@ -7,9 +7,8 @@ const mkdirp = require('mkdirp');
 const Mustache = require('mustache');
 const utils = require('js-utils');
 
-const UTF_8 = 'utf-8';
-
-const readFile = utils.asyncifyCallback(fs.readFile);
+const readFile = file => utils.asyncifyCallback(fs.readFile)(file, 'utf-8');
+const globPattern = utils.asyncifyCallback(glob);
 const writeFile = utils.asyncifyCallback(fs.writeFile);
 const mkdirP = utils.asyncifyCallback(mkdirp);
 
@@ -62,68 +61,46 @@ const options = require('yargs')
 
 const outputIndexSchema = Math.max(0, options.template.indexOf('*'));
 
-function displaySuccess(output) {
-  global.console.log(output);
-}
-
-function displayError(error) {
-  if (error instanceof Error) {
-    global.console.error(error.stack);
-  } else {
-    global.console.error(error);
-  }
-  process.exit(1);
-}
-
-async function globPromise(pattern) {
-  return new Promise(resolve => {
-    glob(pattern, {}, (err, jsons) => {
-      if (err) {
-        throw err;
-      }
-      resolve(jsons);
-    });
-  });
-}
-
-async function partialPromise(partialFile) {
-  const partialContent = await readFile(partialFile, UTF_8);
+async function readPartial(partialFile) {
   return {
-    [path.basename(partialFile)]: partialContent,
+    [path.basename(partialFile)]: await readFile(partialFile),
   };
 }
 
-async function readPartial() {
-  const partials = await globPromise(options.partials);
+async function readPartials(pattern) {
+  if (!pattern) {
+    return {};
+  }
 
-  const files = await Promise.all(partials.map(partial => partialPromise(partial)));
+  const partials = await globPattern(pattern);
+  const files = await Promise.all(partials.map(readPartial));
   return files.reduce((previous, current) => Object.assign(previous, current), {});
 }
 
 async function inline(pattern) {
-  if (pattern) {
-    const files = await globPromise(pattern);
-    const content = await Promise.all(files.map(file => readFile(file, UTF_8)));
-    return content.join('');
+  if (!pattern) {
+    return '';
   }
 
-  return '';
+  const files = await globPattern(pattern);
+  const content = await Promise.all(files.map(file => readFile(file)));
+  return content.join('');
 }
 
-async function mustachePromise(mustacheFile, template) {
+async function getTemplateConfig(configFile, template) {
   try {
-    const content = await readFile(mustacheFile, UTF_8);
+    const content = await readFile(configFile);
     return JSON.parse(content);
   } catch (e) {
-    global.console.warn(`Unable to read ${mustacheFile} for template ${template} with reason ${e}`);
+    global.console.warn(`Unable to read ${configFile} for template ${template} with reason ${e}`);
     return {};
   }
 }
 
-async function templatePromise(template, partials) {
+async function renderMustache(template, partials) {
   const values = await Promise.all([
-    readFile(template, UTF_8),
-    mustachePromise(path.join(path.dirname(template), 'mustache.json'), template),
+    readFile(template),
+    getTemplateConfig(path.join(path.dirname(template), 'mustache.json'), template),
   ]);
 
   const data = values[1];
@@ -132,40 +109,40 @@ async function templatePromise(template, partials) {
   }
 
   const rendered = Mustache.render(values[0], data, partials);
-  if (options.output) {
-    const outputFile = path.join(options.output, template.substring(outputIndexSchema));
-    await mkdirP(path.dirname(outputFile));
-    const output = await writeFile(outputFile, rendered);
-    return output;
+  if (!options.output) {
+    return rendered;
   }
 
-  return rendered;
+  const outputFile = path.join(options.output, template.substring(outputIndexSchema));
+  await mkdirP(path.dirname(outputFile));
+  return writeFile(outputFile, rendered);
+}
+
+function displayError(error) {
+  if (error instanceof Error) {
+    global.console.error(error.stack);
+  } else {
+    global.console.error(error);
+  }
+
+  process.exit(1);
 }
 
 (async () => {
-  const requiredPromises = [];
-
   try {
-    if (options.partials) {
-      requiredPromises.push(readPartial());
+    const partials = await readPartials(options.partials);
+    partials.inlineJs = `<script>${await inline(options.js)}</script>`;
+    partials.inlineCss = `<style>${await inline(options.css)}</style>`;
+    partials.inlineSvg = String(await inline(options.svg));
+
+    const templates = await globPattern(options.template);
+    const values = await Promise.all(templates.map(template => renderMustache(template, partials)));
+
+    if (!options.output) {
+      global.console.log(values.join('\n'));
+    } else {
+      global.console.log('Done!');
     }
-
-    requiredPromises.push(inline(options.js));
-    requiredPromises.push(inline(options.css));
-    requiredPromises.push(inline(options.svg));
-
-    const required = await Promise.all(requiredPromises);
-    const partials = required[0];
-    partials.inlineJs = `<script>${required[1]}</script>`;
-    partials.inlineCss = `<style>${required[2]}</style>`;
-    partials.inlineSvg = String(required[3]);
-
-    const templates = await globPromise(options.template);
-    const values = await Promise.all(
-      templates.map(template => templatePromise(template, partials)),
-    );
-
-    displaySuccess(values.join('\n'));
   } catch (e) {
     displayError(e);
   }
