@@ -4,7 +4,8 @@ const fs = require('fs');
 const glob = require('glob');
 const utils = require('js-utils');
 
-const readFile = utils.asyncifyCallback(fs.readFile);
+const readFile = file => utils.asyncifyCallback(fs.readFile)(file, 'utf-8');
+const globPattern = utils.asyncifyCallback(glob);
 const writeFile = utils.asyncifyCallback(fs.writeFile);
 
 const options = require('yargs')
@@ -24,32 +25,8 @@ const options = require('yargs')
   .help('help')
   .strict().argv;
 
-function displaySuccess(output) {
-  global.console.log(output);
-}
-
-function displayError(error) {
-  if (error instanceof Error) {
-    global.console.error(error.stack);
-  } else {
-    global.console.error(error);
-  }
-  process.exit(1);
-}
-
-async function globPromise(pattern) {
-  return new Promise(resolve => {
-    glob(pattern, {}, (err, jsons) => {
-      if (err) {
-        throw err;
-      }
-      resolve(jsons);
-    });
-  });
-}
-
-async function jsonPromise(json) {
-  const content = await readFile(json, 'utf-8');
+async function readJson(json) {
+  const content = await readFile(json);
   return JSON.parse(content);
 }
 
@@ -70,13 +47,22 @@ ${urls}
 </urlset>`;
 }
 
+function displayError(error) {
+  if (error instanceof Error) {
+    global.console.error(error.stack);
+  } else {
+    global.console.error(error);
+  }
+  process.exit(1);
+}
+
 (async () => {
   try {
-    const jsons = await globPromise(options.json);
-    const pages = await Promise.all(jsons.map(jsonPromise));
+    const jsons = await globPattern(options.json);
+    const pages = await Promise.all(jsons.map(readJson));
     await writeFile(options.sitemap, sitemapStructure(pages.map(sitemapConverter).join('')));
 
-    displaySuccess(jsons.join('\n'));
+    global.console.log('Done!');
   } catch (e) {
     displayError(e);
   }
