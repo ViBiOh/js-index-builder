@@ -10,7 +10,7 @@ const utils = require('js-utils');
 const readFile = file => utils.asyncifyCallback(fs.readFile)(file, 'utf-8');
 const globPattern = utils.asyncifyCallback(glob);
 const writeFile = utils.asyncifyCallback(fs.writeFile);
-const mkdirP = utils.asyncifyCallback(mkdirp);
+const mkdir = utils.asyncifyCallback(mkdirp);
 
 const options = require('yargs')
   .reset()
@@ -114,7 +114,7 @@ async function renderMustache(template, partials) {
   }
 
   const outputFile = path.join(options.output, template.substring(outputIndexSchema));
-  await mkdirP(path.dirname(outputFile));
+  await mkdir(path.dirname(outputFile));
   return writeFile(outputFile, rendered);
 }
 
