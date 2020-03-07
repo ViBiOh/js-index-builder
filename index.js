@@ -1,15 +1,13 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 const glob = require('glob');
 const mkdirp = require('mkdirp');
 const Mustache = require('mustache');
 const utils = require('js-utils');
 
-const readFile = file => utils.asyncifyCallback(fs.readFile)(file, 'utf-8');
 const globPattern = utils.asyncifyCallback(glob);
-const writeFile = utils.asyncifyCallback(fs.writeFile);
 
 const options = require('yargs')
   .reset()
@@ -62,7 +60,7 @@ const outputIndexSchema = Math.max(0, options.template.indexOf('*'));
 
 async function readPartial(partialFile) {
   return {
-    [path.basename(partialFile)]: await readFile(partialFile),
+    [path.basename(partialFile)]: await fs.readFile(partialFile, 'utf-8'),
   };
 }
 
@@ -82,13 +80,13 @@ async function inline(pattern) {
   }
 
   const files = await globPattern(pattern);
-  const content = await Promise.all(files.map(file => readFile(file)));
+  const content = await Promise.all(files.map(file => fs.readFile(file, 'utf-8')));
   return content.join('');
 }
 
 async function getTemplateConfig(configFile, template) {
   try {
-    const content = await readFile(configFile);
+    const content = await fs.readFile(configFile, 'utf-8');
     return JSON.parse(content);
   } catch (e) {
     global.console.warn(`Unable to read ${configFile} for template ${template} with reason ${e}`);
@@ -98,7 +96,7 @@ async function getTemplateConfig(configFile, template) {
 
 async function renderMustache(template, partials) {
   const values = await Promise.all([
-    readFile(template),
+    fs.readFile(template, 'utf-8'),
     getTemplateConfig(path.join(path.dirname(template), 'mustache.json'), template),
   ]);
 
@@ -114,7 +112,7 @@ async function renderMustache(template, partials) {
 
   const outputFile = path.join(options.output, template.substring(outputIndexSchema));
   await mkdirp(path.dirname(outputFile));
-  return writeFile(outputFile, rendered);
+  return fs.writeFile(outputFile, rendered);
 }
 
 function displayError(error) {
