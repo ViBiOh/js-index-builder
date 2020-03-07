@@ -1,12 +1,7 @@
 #!/usr/bin/env node
 
-const fs = require('fs');
+const fs = require('fs').promises;
 const glob = require('glob');
-const utils = require('js-utils');
-
-const readFile = file => utils.asyncifyCallback(fs.readFile)(file, 'utf-8');
-const globPattern = utils.asyncifyCallback(glob);
-const writeFile = utils.asyncifyCallback(fs.writeFile);
 
 const options = require('yargs')
   .reset()
@@ -26,7 +21,7 @@ const options = require('yargs')
   .strict().argv;
 
 async function readJson(json) {
-  const content = await readFile(json);
+  const content = await fs.readFile(json, 'utf-8');
   return JSON.parse(content);
 }
 
@@ -54,14 +49,17 @@ function displayError(error) {
   process.exit(1);
 }
 
-(async () => {
-  try {
-    const jsons = await globPattern(options.json);
+try {
+  glob(options.json, async (jsons, err) => {
+    if (err) {
+      throw err;
+    }
+
     const pages = await Promise.all(jsons.map(readJson));
-    await writeFile(options.sitemap, sitemapStructure(pages.map(sitemapConverter).join('')));
+    await fs.writeFile(options.sitemap, sitemapStructure(pages.map(sitemapConverter).join('')));
 
     global.console.log('Done!');
-  } catch (e) {
-    displayError(e);
-  }
-})();
+  });
+} catch (e) {
+  displayError(e);
+}

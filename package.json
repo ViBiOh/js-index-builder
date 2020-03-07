@@ -4,7 +4,6 @@
   "description": "Cache buster for mustache",
   "main": "index.js",
   "scripts": {
-    "postinstall": "chmod +x *.js",
     "init": "curl -q -sSL --max-time 10 'https://raw.githubusercontent.com/ViBiOh/scripts/master/bootstrap' | bash -s 'git_hooks'",
     "format": "prettier --write \"./*.js\"",
     "style": "eslint --fix \"./*.js\"",
