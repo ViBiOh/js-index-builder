@@ -50,7 +50,7 @@ function displayError(error) {
 }
 
 try {
-  glob(options.json, async (jsons, err) => {
+  glob(options.json, async (err, jsons) => {
     if (err) {
       throw err;
     }
