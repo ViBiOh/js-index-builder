@@ -1,9 +1,9 @@
 ---
 language: node_js
-node_js: 14
+node_js: 15
 script: npm run build
 cache:
   directories:
-    - "${HOME}/.npm"
+    - '${HOME}/.npm'
 notifications:
   email: false
