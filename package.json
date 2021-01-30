@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/ViBiOh/js-index-builder",
   "devDependencies": {
-    "clean-css": "4.2.3",
+    "clean-css": "5.0.1",
     "eslint": "7.18.0",
     "eslint-config-airbnb": "18.2.1",
     "eslint-config-prettier": "7.2.0",
