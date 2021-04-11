@@ -21,13 +21,17 @@ jobs:
     name: Javascript
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2-beta
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup NodeJS
+        uses: actions/setup-node@v2-beta
         with:
           node-version: "15"
-      - run: |
+      - name: Build
+        run: |
           npm ci
           npm run format
           npm run style
           npm run build
-      - uses: codecov/codecov-action@v1
+      - name: Codecov
+        uses: codecov/codecov-action@v1
