@@ -10,7 +10,6 @@ const utils = require('js-utils');
 const globPattern = utils.asyncifyCallback(glob);
 
 const options = require('yargs')
-  .reset()
   .options('template', {
     alias: 't',
     required: true,
@@ -80,7 +79,7 @@ async function inline(pattern) {
   }
 
   const files = await globPattern(pattern);
-  const content = await Promise.all(files.map(file => fs.readFile(file, 'utf-8')));
+  const content = await Promise.all(files.map((file) => fs.readFile(file, 'utf-8')));
   return content.join('');
 }
 
@@ -133,7 +132,9 @@ function displayError(error) {
     partials.inlineSvg = String(await inline(options.svg));
 
     const templates = await globPattern(options.template);
-    const values = await Promise.all(templates.map(template => renderMustache(template, partials)));
+    const values = await Promise.all(
+      templates.map((template) => renderMustache(template, partials)),
+    );
 
     if (!options.output) {
       global.console.log(values.join('\n'));

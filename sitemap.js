@@ -4,7 +4,6 @@ const fs = require('fs').promises;
 const glob = require('glob');
 
 const options = require('yargs')
-  .reset()
   .options('json', {
     alias: 'j',
     required: true,
