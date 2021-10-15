@@ -127,8 +127,12 @@ function displayError(error) {
 (async () => {
   try {
     const partials = await readPartials(options.partials);
-    partials.inlineJs = `<script>${await inline(options.js)}</script>`;
-    partials.inlineCss = `<style>${await inline(options.css)}</style>`;
+    partials.inlineJs = `<script type="text/javascript" nonce="js-main">${await inline(
+      options.js,
+    )}</script>`;
+    partials.inlineCss = `<style type="text/css" nonce="css-main>${await inline(
+      options.css,
+    )}</style>`;
     partials.inlineSvg = String(await inline(options.svg));
 
     const templates = await globPattern(options.template);
