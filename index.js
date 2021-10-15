@@ -6,6 +6,7 @@ const glob = require('glob');
 const mkdirp = require('mkdirp');
 const Mustache = require('mustache');
 const utils = require('js-utils');
+const crypto = require('crypto');
 
 const globPattern = utils.asyncifyCallback(glob);
 
@@ -114,6 +115,10 @@ async function renderMustache(template, partials) {
   return fs.writeFile(outputFile, rendered);
 }
 
+function hash256(content) {
+  return crypto.createHash('sha256').update(content).digest('base64');
+}
+
 function displayError(error) {
   if (error instanceof Error) {
     global.console.error(error.stack);
@@ -127,12 +132,12 @@ function displayError(error) {
 (async () => {
   try {
     const partials = await readPartials(options.partials);
-    partials.inlineJs = `<script type="text/javascript" nonce="js-main">${await inline(
-      options.js,
-    )}</script>`;
-    partials.inlineCss = `<style type="text/css" nonce="css-main>${await inline(
-      options.css,
-    )}</style>`;
+
+    const jsContent = await inline(options.js);
+    const cssContent = await inline(options.css);
+
+    partials.inlineJs = `<script type="text/javascript">${jsContent}</script>`;
+    partials.inlineCss = `<style type="text/css">${cssContent}</style>`;
     partials.inlineSvg = String(await inline(options.svg));
 
     const templates = await globPattern(options.template);
@@ -145,6 +150,9 @@ function displayError(error) {
     } else {
       global.console.log('Done!');
     }
+
+    global.console.log(`JS_sha256=${hash256(jsContent)}`);
+    global.console.log(`CSS_sha256=${hash256(cssContent)}`);
   } catch (e) {
     displayError(e);
   }
