@@ -46,7 +46,7 @@ jobs:
           npm run style
           npm run build
       - name: Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v3
 
   sonarcloud:
     name: SonarCloud
