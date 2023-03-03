@@ -33,7 +33,7 @@
     "prettier": "2.8.4"
   },
   "dependencies": {
-    "glob": "9.1.2",
+    "glob": "9.2.1",
     "js-utils": "github:ViBiOh/js-utils#main",
     "mkdirp": "2.1.4",
     "mustache": "4.2.0",
