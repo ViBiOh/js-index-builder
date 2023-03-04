@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require('fs').promises;
-const glob = require('glob');
+const { glob } = require('glob');
 
 const options = require('yargs')
   .options('json', {
@@ -48,17 +48,15 @@ function displayError(error) {
   process.exit(1);
 }
 
-try {
-  glob(options.json, async (err, jsons) => {
-    if (err) {
-      throw err;
-    }
+(async () => {
+  try {
+    const jsons = await glob(options.json);
 
     const pages = await Promise.all(jsons.map(readJson));
     await fs.writeFile(options.sitemap, sitemapStructure(pages.map(sitemapConverter).join('')));
 
     global.console.log('Done!');
-  });
-} catch (e) {
-  displayError(e);
-}
+  } catch (e) {
+    displayError(e);
+  }
+})();

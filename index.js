@@ -2,13 +2,10 @@
 
 const fs = require('fs').promises;
 const path = require('path');
-const glob = require('glob');
+const { glob } = require('glob');
 const mkdirp = require('mkdirp');
 const Mustache = require('mustache');
-const utils = require('js-utils');
 const crypto = require('crypto');
-
-const globPattern = utils.asyncifyCallback(glob);
 
 const options = require('yargs')
   .options('template', {
@@ -69,7 +66,7 @@ async function readPartials(pattern) {
     return {};
   }
 
-  const partials = await globPattern(pattern);
+  const partials = await glob(pattern);
   const files = await Promise.all(partials.map(readPartial));
   return files.reduce((previous, current) => Object.assign(previous, current), {});
 }
@@ -79,7 +76,7 @@ async function inline(pattern) {
     return '';
   }
 
-  const files = await globPattern(pattern);
+  const files = await glob(pattern);
   const content = await Promise.all(files.map((file) => fs.readFile(file, 'utf-8')));
   return content.join('');
 }
@@ -140,7 +137,7 @@ function displayError(error) {
     partials.inlineCss = `<style type="text/css">${cssContent}</style>`;
     partials.inlineSvg = String(await inline(options.svg));
 
-    const templates = await globPattern(options.template);
+    const templates = await glob(options.template);
     const values = await Promise.all(
       templates.map((template) => renderMustache(template, partials)),
     );
