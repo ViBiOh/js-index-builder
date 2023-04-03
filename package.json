@@ -33,7 +33,7 @@
     "prettier": "2.8.7"
   },
   "dependencies": {
-    "glob": "9.3.2",
+    "glob": "9.3.4",
     "mkdirp": "2.1.6",
     "mustache": "4.2.0",
     "yargs": "17.7.1"
