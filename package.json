@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "glob": "9.3.4",
-    "mkdirp": "2.1.6",
+    "mkdirp": "3.0.0",
     "mustache": "4.2.0",
     "yargs": "17.7.1"
   },
