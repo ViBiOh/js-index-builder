@@ -3,7 +3,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { glob } = require('glob');
-const mkdirp = require('mkdirp');
+const { mkdirp } = require('mkdirp');
 const Mustache = require('mustache');
 const crypto = require('crypto');
 
