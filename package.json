@@ -4,7 +4,7 @@
   "description": "Cache buster for mustache",
   "main": "index.js",
   "scripts": {
-    "init": "curl --disable --silent --show-error --location --max-time 30 'https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap' | bash -s 'git_hooks'",
+    "init": "curl --disable --silent --show-error --location --max-time 30 'https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh' | bash -s 'git_hooks'",
     "format": "prettier --write \"./*.js\"",
     "style": "eslint --fix \"./*.js\"",
     "build": "npm run format && npm run style"
@@ -25,11 +25,7 @@
   "homepage": "https://github.com/ViBiOh/js-index-builder",
   "devDependencies": {
     "clean-css": "5.3.3",
-    "eslint": "8.57.0",
-    "eslint-config-airbnb": "19.0.4",
-    "eslint-config-airbnb-base": "15.0.0",
-    "eslint-config-prettier": "9.1.0",
-    "eslint-plugin-import": "2.29.1",
+    "eslint": "9.1.0",
     "prettier": "3.2.5"
   },
   "dependencies": {
