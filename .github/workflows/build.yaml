@@ -45,5 +45,3 @@ jobs:
           npm run format
           npm run style
           npm run build
-      - name: Codecov
-        uses: codecov/codecov-action@v4
