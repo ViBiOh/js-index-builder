@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 
-const fs = require('fs').promises;
-const path = require('path');
-const { glob } = require('glob');
-const { mkdirp } = require('mkdirp');
-const Mustache = require('mustache');
-const crypto = require('crypto');
+import Mustache from 'mustache';
+import path from 'path';
+import yargs from 'yargs';
+import { createHash } from 'crypto';
+import { glob } from 'glob';
+import { hideBin } from 'yargs/helpers';
+import { mkdirp } from 'mkdirp';
+import { promises as fs } from 'fs';
 
-const options = require('yargs')
+const options = yargs(hideBin(process.argv))
   .options('template', {
     alias: 't',
     required: true,
@@ -113,7 +115,7 @@ async function renderMustache(template, partials) {
 }
 
 function hash256(content) {
-  return crypto.createHash('sha256').update(content).digest('base64');
+  return createHash('sha256').update(content).digest('base64');
 }
 
 function displayError(error) {

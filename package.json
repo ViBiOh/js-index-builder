@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "init": "curl --disable --silent --show-error --location --max-time 30 'https://raw.githubusercontent.com/ViBiOh/scripts/main/bootstrap.sh' | bash -s 'git_hooks'",
-    "format": "prettier --write \"./*.js\"",
-    "style": "eslint --fix \"./*.js\"",
+    "format": "prettier --write \"./*.mjs\"",
+    "style": "eslint --fix \"./*.mjs\"",
     "build": "npm run format && npm run style"
   },
   "repository": {

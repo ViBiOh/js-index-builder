@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
-const fs = require('fs').promises;
-const { glob } = require('glob');
+import yargs from 'yargs';
+import { glob } from 'glob';
+import { hideBin } from 'yargs/helpers';
+import { promises as fs } from 'fs';
 
-const options = require('yargs')
+const options = yargs(hideBin(process.argv))
   .options('json', {
     alias: 'j',
     required: true,
