@@ -24,7 +24,7 @@
   "homepage": "https://github.com/ViBiOh/js-index-builder",
   "devDependencies": {
     "clean-css": "5.3.3",
-    "eslint": "10.8.0",
+    "eslint": "10.8.1",
     "prettier": "3.9.6"
   },
   "dependencies": {
